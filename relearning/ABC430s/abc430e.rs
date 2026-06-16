@@ -1,16 +1,14 @@
 // string matching algorithm
 use proconio::{input, marker::Chars};
+// abc430E:
+// Q. How many rotations of String: A are at least needed to match it to String: B?
+// A.Knuth-Morris-Pratt (KMP): KMP relies on a prefix table (or partial match table) to avoid redundant comparisons. It’s particularly efficient for repetitive patterns in the search string.
+// LCP(Longest Common Prefix)
 fn main() {
     input! {t: usize}
     for _case in 0..t {
         input! {a: Chars, b: Chars}
         let double_a: Vec<char> = a.iter().cloned().chain(a.iter().cloned()).collect();
-        let a_len = a.len();
-        let b_len = b.len();
-        if a_len < b_len {
-            println!("-1");
-            continue;
-        }
         let lps = get_lps(&b);
         let matched: Vec<usize> = kmp_search(&double_a, &b, &lps);
         if matched.len() == 0 {
@@ -85,6 +83,8 @@ fn kmp_search(text: &Vec<char>, pattern: &Vec<char>, lps: &Vec<usize>) -> Vec<us
             let first_index: usize = text_index - pattern_index;
             matched.push(first_index);
         }
+        text_index += 1;
+        pattern_index = 0;
     }
     return matched;
 }
