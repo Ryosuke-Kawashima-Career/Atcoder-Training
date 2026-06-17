@@ -26,27 +26,27 @@ fn get_z_array(text: &str, pattern: &str) -> Vec<usize> {
     Returns:
         The z_array
     */
-    // check if pattern -> $ -> text
+    // check if pattern -> $ -> text (use $ to prevent matching from pattern to text)
     let combined: Vec<char> = format!("{}${}", pattern, text).chars().collect();
     let n: usize = combined.len();
+    // z_array[i]: length of the longest common prefix (LCP) of text[i..] and pattern
     let mut z_array: Vec<usize> = vec![0; n];
-    // z_window: [left right]
+    // z_window: [left right]: array[0 right - left] == array[left right]
     let mut left: usize = 0;
     let mut right: usize = 0;
     for i in 1..n {
-        if i > right {
-            // inside the z window
-            if i <= right {
-                z_array[i] = (right + 1 - i).min(z_array[i - 1]);
-            }
-            // manually expand the z_window if possible
-            while i + z_array[i] < n && combined[z_array[i]] == combined[i + z_array[i]] {
-                z_array[i] += 1;
-            }
-            if i + z_array[i] - 1 > right {
-                left = i;
-                right = i + z_array[i] - 1;
-            }
+        // inside the z window: [left right]
+        if i <= right {
+            z_array[i] = (right + 1 - i).min(z_array[i - left]);
+        }
+        // manually expand the z_window if possible
+        while i + z_array[i] < n && combined[z_array[i]] == combined[i + z_array[i]] {
+            z_array[i] += 1;
+        }
+        // update z_window when the match exceeds its right border
+        if i + z_array[i] - 1 > right {
+            left = i;
+            right = i + z_array[i] - 1;
         }
     }
     return z_array;
