@@ -13,6 +13,7 @@ fn main() {
         min_r_at_l[l] = min_r_at_l[l].min(r);
         *count_range.entry((l, r)).or_insert(0) += 1;
     }
+    // do not forget about sorting
     for i in 0..=n {
         by_l[i].sort();
         by_r[i].sort();
