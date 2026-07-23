@@ -1,12 +1,18 @@
 use proconio::input;
-
+// Rectangle Sum
+// Q. There are some points on the coordinate plane with weights.
+// A. Sweepline algorithm by fixing X-axis and moving Y-axis.
+// Range sum -> Fenwick Tree
+// Coordinate compression -> Binary Search
 struct FenwickTree {
     tree: Vec<u64>,
 }
 
 impl FenwickTree {
     fn new(n: usize) -> Self {
-        Self { tree: vec![0; n + 1] }
+        Self {
+            tree: vec![0; n + 1],
+        }
     }
 
     fn add(&mut self, mut idx: usize, val: u64) {
