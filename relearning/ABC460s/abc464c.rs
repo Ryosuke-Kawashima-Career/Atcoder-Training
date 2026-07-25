@@ -3,7 +3,6 @@ use proconio::input;
 fn main() {
     input! {n: usize, m: usize, mut bird_color_days: [(usize, usize, usize); n]}
     bird_color_days.sort_by_key(|tup| tup.1);
-    let mut colors_of_birds: Vec<Vec<usize>> = vec![0; n];
     let mut colors_count: Vec<usize> = vec![0; n + 1];
     let mut cur_index: usize = 0;
     let mut different_colors: usize = 0;
