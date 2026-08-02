@@ -44,7 +44,7 @@ fn main() {
                 dist[nr][nc][d] = 1;
                 parent[nr][nc][d] = (sr, sc, 4);
                 que.push_back((nr, nc, d));
-    }
+            }
         }
     }
 
