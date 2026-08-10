@@ -1,71 +1,120 @@
 use proconio::input;
+// ABC470C
+// Q. 1 x: Increase the value of Ax by 1.
+// 2: For each i=1,2,…,N, if Ai≥1, decrease the value of Ai by 1.
+// A. Store the indexes which changed its status.
+// XOR: self-inverse
 struct FenwickXor {
-    data: Vec<i64>,
+    tree: Vec<u8>,
 }
+
 impl FenwickXor {
-    #[inline]
-    fn next_power_of_2(n: usize) -> usize {
-        let mut power2: usize = 1;
-        while power2 < n {
-            power2 <<= 1;
-        }
-        power2
-    }
-    #[inline]
-    fn lsb(n: usize) -> usize {
-        n & usize::wrapping_neg(n)
-    }
-    fn new(n: usize) -> FenwickXor {
-        let size: usize = FenwickXor::next_power_of_2(n);
+    fn new(power_of_two: usize) -> Self {
         FenwickXor {
-            data: vec![0; size],
+            tree: vec![0; power_of_two + 1],
         }
     }
 
-    fn update(&mut self, mut index: usize) {
-        let cur_value: i64 = self.data[index];
-        let next_value: i64 = cur_value ^ (cur_value + 1);
-        while index < self.data.len() {
-            self.data[index] ^= 1;
-            index += Self::lsb(index);
+    #[inline(always)]
+    fn toggle(&mut self, mut idx: usize) {
+        /* Toggle the value at index idx in the Fenwick tree
+        0 <-> 1
+        */
+        idx += 1;
+        let len = self.tree.len();
+        while idx < len {
+            self.tree[idx] ^= 1;
+            /* Add the lsb of idx to idx */
+            idx += idx & (!idx + 1);
         }
     }
 
-    fn query(&self, mut index: usize) -> i64 {
-        let mut result: i64 = 0;
-        while index > 0 {
-            result ^= self.data[index];
-            index -= Self::lsb(index);
+    #[inline(always)]
+    fn query_prefix(&self, mut idx: usize) -> u8 {
+        idx += 1;
+        let mut res = 0;
+        while idx > 0 {
+            res ^= self.tree[idx];
+            // Calculate lsb
+            idx &= idx - 1;
         }
-        return result;
+        res
     }
 
-    fn query_range(&self, left: usize, right: usize) -> i64 {
-        if left > right {
+    #[inline(always)]
+    fn query_range(&self, l: usize, r: usize) -> u8 {
+        /* Returns the parity of [l r] */
+        if l > r {
             return 0;
         }
-        return self.query(right) ^ self.query(left - 1);
+        let r_val = self.query_prefix(r);
+        if l == 0 {
+            r_val
+        } else {
+            r_val ^ self.query_prefix(l - 1)
+        }
     }
 }
 
 fn main() {
-    input! {
-        n: usize,
-        q: usize,
-    }
-    let mut fenwick = FenwickXor::new(n);
-    let mut a: Vec<usize> = vec![0; n];
-    for _query in 0..q {
-        input! {query_type: usize}
-        if query_type == 1 {
-            input! {x: Usize1}
-            if a[x] == 0 {
-                fenwick.update(x);
+    input! {n: usize, q: usize}
+
+    let max_val = q + 5;
+    let mut parity: Vec<u8> = vec![0u8; max_val + 1];
+    let mut b: Vec<usize> = vec![0; n + 1];
+    // bits[k: k-th bit, from 0]
+    let mut bits: Vec<FenwickXor> = (0..19).map(|k| FenwickXor::new(1 << (k + 1))).collect();
+    let mut shift: usize = 0;
+
+    for _ in 0..q {
+        input! {qtype: usize}
+        if qtype == 1 {
+            // Add one to a[x]
+            input! {x: usize}
+            let prev_value: usize = b[x];
+            let new_value: usize = prev_value.max(shift) + 1;
+            b[x] = new_value;
+            if prev_value > shift {
+                parity[prev_value] ^= 1;
+
+                for keta in 0..19 {
+                    let size: usize = 1 << (keta + 1);
+                    // erase the old value
+                    bits[keta].toggle(prev_value % size);
+                }
             }
-            a[x] += 1;
+            parity[new_value] ^= 1;
+            for keta in 0..19 {
+                let size: usize = 1 << (keta + 1);
+                // register the new value
+                bits[keta].toggle(new_value % size);
+            }
         } else {
-            let result = fenwick.query_range(0, n);
-            println!("{}", result);
+            // Turn the values > 0 to values - 1, then calculate the nim
+            shift += 1;
+            if parity[shift] == 1 {
+                parity[shift] = 0;
+                for keta in 0..19 {
+                    let size: usize = 1 << (keta + 1);
+                    bits[keta].toggle(shift % size);
+                }
+            }
         }
+        let mut nim: usize = 0;
+        for keta in 0..19 {
+            let size: usize = 1 << (keta + 1);
+            let half_size: usize = 1 << keta;
+            let start: usize = (shift + half_size) % size;
+            let end: usize = (shift + size - 1) % size;
+            let partiy: u8 = if start <= end {
+                bits[keta].query_range(start, end)
+            } else {
+                bits[keta].query_range(start, size - 1) ^ bits[keta].query_prefix(end)
+            };
+            if partiy == 1 {
+                nim |= 1 << keta;
+            }
+        }
+        println!("{}", nim);
     }
 }
