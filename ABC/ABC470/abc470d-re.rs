@@ -1,6 +1,7 @@
 use proconio::input;
 use proconio::marker::Usize1;
-
+// ABC470D
+// Pointer and Source array
 fn main() {
     input! {n: usize, q: usize, mut p: [Usize1; n]}
     // pointer -> source
