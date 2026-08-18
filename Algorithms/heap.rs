@@ -1,4 +1,3 @@
-
 struct Heap<T: Ord> {
     /* Return the minimum value if any */
     data: Vec<T>,
@@ -72,6 +71,7 @@ impl<T: Ord> Heap<T> {
         /* This method is called to restore the min-heap property downwards */
         let n = self.data.len();
         loop {
+            // Going for the children of the node (idx)
             let left_idx = 2 * idx + 1;
             let right_idx = 2 * idx + 2;
             let mut min_idx = idx;
