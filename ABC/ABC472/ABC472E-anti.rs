@@ -1,8 +1,7 @@
 use proconio::{input, marker::Usize1};
 use std::collections::VecDeque;
-use std::io::{self, BufWriter, Write};
 
-fn solve<W: Write>(out: &mut W) {
+fn solve() {
     input! {
         n: usize,
         m: usize,
@@ -19,7 +18,6 @@ fn solve<W: Write>(out: &mut W) {
     let mut parent = vec![None; n];
     let mut que = VecDeque::new();
 
-    // The graph is connected, so start BFS from vertex 0
     dist[0] = Some(0);
     que.push_back(0);
 
@@ -29,8 +27,6 @@ fn solve<W: Write>(out: &mut W) {
         let d_u = dist[u].unwrap();
         for &v in &graph[u] {
             if let Some(d_v) = dist[v] {
-                // In BFS, an edge between two vertices at the same distance (same parity)
-                // indicates an odd cycle.
                 if d_u == d_v {
                     odd_cycle_edge = Some((u, v));
                     break 'bfs;
@@ -44,7 +40,6 @@ fn solve<W: Write>(out: &mut W) {
     }
 
     if let Some((u, v)) = odd_cycle_edge {
-        // Trace back paths from u and v to their Lowest Common Ancestor (LCA)
         let mut path_u = vec![u];
         let mut path_v = vec![v];
         let mut curr_u = u;
@@ -57,19 +52,18 @@ fn solve<W: Write>(out: &mut W) {
             path_v.push(curr_v);
         }
 
-        // path_v ends with LCA which is already in path_u
         path_v.pop();
         path_v.reverse();
         path_u.extend(path_v);
 
         let k = path_u.len();
-        writeln!(out, "{}", k).unwrap();
+        println!("{}", k);
         for i in 0..k {
-            write!(out, "{}{}", path_u[i] + 1, if i + 1 == k { "" } else { " " }).unwrap();
+            print!("{}{}", path_u[i] + 1, if i + 1 == k { "" } else { " " });
         }
-        writeln!(out).unwrap();
+        println!();
     } else {
-        writeln!(out, "-1").unwrap();
+        println!("-1");
     }
 }
 
@@ -77,9 +71,7 @@ fn main() {
     input! {
         t: usize,
     }
-    let stdout = io::stdout();
-    let mut out = BufWriter::new(stdout.lock());
     for _ in 0..t {
-        solve(&mut out);
+        solve();
     }
 }
