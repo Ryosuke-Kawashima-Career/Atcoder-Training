@@ -1,16 +1,22 @@
 use proconio::input;
-// ABC473D
+
+// ABC473D - Coefficient Stair
 // Q. Enumerate sequences such that the sum of i x a_i == k in lexicographical order
-// A. Recursive DFS
+// A. Recursive DFS with O(1) determination of the last element
 fn main() {
-    input! {n: usize, k: usize}
+    input! {
+        n: usize,
+        k: usize,
+    }
     let mut memo: Vec<usize> = Vec::new();
     lexico(1, n, k, &mut memo);
 }
 
 fn lexico(start: usize, n: usize, k: usize, memo: &mut Vec<usize>) -> bool {
-    if n == 0 {
-        if k == 0 {
+    if n == 1 {
+        if k % start == 0 {
+            let last_element = k / start;
+            memo.push(last_element);
             println!(
                 "{}",
                 memo.iter()
@@ -18,12 +24,14 @@ fn lexico(start: usize, n: usize, k: usize, memo: &mut Vec<usize>) -> bool {
                     .collect::<Vec<String>>()
                     .join(" ")
             );
+            memo.pop();
             return true;
         } else {
             return false;
         }
     }
-    // Avoid returning the very first element
+
+    // Avoid returning early on the first found solution
     let mut found = false;
     for num in 0..=k {
         if num * start > k {
