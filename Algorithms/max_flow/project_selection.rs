@@ -32,7 +32,7 @@ impl MaxFlow {
         self.graph[v2].push(Edge {
             to: v1,
             cap: 0,
-            rev_index2,
+            rev: rev_index2,
         })
     }
     fn bfs(&mut self, source: usize, sink: usize) -> bool {
@@ -55,26 +55,26 @@ impl MaxFlow {
     fn dfs(&mut self, curr: usize, sink: usize, flow: i64) -> i64 {
         /* Calculates how much flow the residual graph can push */
         if curr == sink {
-            return 0;
+            return flow;
         }
-        let mut pushed_flow: i64 = 0;
         let num_edges: usize = self.graph[curr].len();
-        for i in self.iter[curr]..num_edges {
+        while self.iter[curr] < num_edges {
+            let i: usize = self.iter[curr];
             let edge = self.graph[curr][i];
             let next: usize = edge.to;
             let capacity: i64 = edge.cap;
             if self.level[curr] + 1 == self.level[next] {
                 let next_flow: i64 = self.dfs(next, sink, capacity.min(flow));
                 if next_flow > 0 {
-                    pushed_flow += next_flow;
                     self.graph[curr][i].cap -= next_flow;
                     let edge_rev: usize = edge.rev;
                     self.graph[next][edge_rev].cap += next_flow;
+                    return next_flow;
                 }
             }
+            self.iter[curr] += 1;
         }
-        self.iter[curr] = num_edges;
-        return pushed_flow;
+        return 0;
     }
     fn max_flow(&mut self, source: usize, sink: usize) -> i64 {
         let mut total_flow: i64 = 0;
@@ -95,17 +95,22 @@ edge of v from t: the cost of being chosen
  */
 fn main() {
     input! {n: usize, m: usize, p: [i64; n], ab: [(usize, usize); m]};
+    let source: usize = 0;
+    let sink: usize = n + 1;
     let mut dinic = MaxFlow::new(n + 2);
+    let mut total_positive: i64 = 0;
     for station in 1..=n {
         if p[station - 1] > 0 {
-            dinic.add_edge(station, n + 1, p[station - 1]);
+            total_positive += p[station - 1];
+            dinic.add_edge(source, station, p[station - 1]);
         } else {
-            dinic.add_edge(0, station, -p[station - 1]);
+            dinic.add_edge(station, sink, -p[station - 1]);
         }
     }
-    for &(a, b) in iter() {
+    for &(a, b) in ab.iter() {
         dinic.add_edge(a, b, INF);
     }
-    let ans: i64 = dinic.max_flow(0, n + 1);
-    println!("{}", ans);
+    let min_loss: i64 = dinic.max_flow(source, sink);
+    let max_profit: i64 = total_positive - min_loss;
+    println!("{}", max_profit);
 }
