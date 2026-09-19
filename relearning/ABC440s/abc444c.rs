@@ -1,35 +1,55 @@
 use proconio::input;
 use std::collections::HashSet;
 fn main() {
-    input! {n: usize, a: [usize; n]}
-    let sum_a: usize = a.iter().sum();
+    input! {n: usize, mut a: [usize; n]}
+    a.sort();
     let mut answer: Vec<usize> = Vec::new();
-    let a_set = a.iter().cloned().collect::<HashSet<_>>();
-    divide(sum_a, &a_set, &mut answer);
-    answer.sort();
-    answer.dedup();
-    println!(
-        "{}",
-        answer
-            .iter()
-            .map(|&x| x.to_string())
-            .collect::<Vec<String>>()
-            .join(" ")
-    );
+    solve_case_intact(&a, &mut answer);
+    solve_case_split(&a, &mut answer);
+    let ans: String = answer
+        .iter()
+        .map(|&x| x.to_string())
+        .collect::<Vec<String>>()
+        .join(" ");
+    println!("{}", ans);
 }
 
-fn divide(sum_a: usize, a_set: &HashSet<usize>, answer: &mut Vec<usize>) {
-    /* Divide sum_a into elements contained in `a_set` */
-    if sum_a == 0 {
-        return;
+fn solve_case_intact(a: &[usize], answer: &mut Vec<usize>) {
+    let n: usize = a.len();
+    let upper_bound: usize = a[n - 1];
+    let candidate: usize = upper_bound;
+    let mut left: usize = 0;
+    let mut right: usize = n - 1;
+    while right > 0 && a[right] == upper_bound {
+        right -= 1;
     }
-    for &element in a_set.iter() {
-        if element > sum_a {
-            continue;
+    while left + 1 < right {
+        if a[left] + a[right] == candidate {
+            left += 1;
+            right -= 1;
+        } else {
+            return;
         }
-        let remainder = sum_a - element;
-        answer.push(element);
-        divide(remainder, a_set, answer);
-        answer.pop();
     }
+    answer.push(candidate);
+}
+
+fn solve_case_split(a: &[usize], answer: &mut Vec<usize>) {
+    let n: usize = a.len();
+    let upper_bound: usize = a[n - 1];
+    let candidate: usize = a[0] + upper_bound;
+    let mut left: usize = 0;
+    let mut right: usize = n - 1;
+    while right > 0 && a[right] == upper_bound {
+        right -= 1;
+    }
+    while left + 1 < right {
+        if a[left] + a[right] == candidate {
+            left += 1;
+            right -= 1;
+        } else {
+            return;
+        }
+    }
+    answer.push(candidate);
 }
