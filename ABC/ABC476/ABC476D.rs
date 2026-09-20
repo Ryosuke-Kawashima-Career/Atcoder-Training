@@ -5,8 +5,8 @@ fn main() {
     b.sort();
     let mut b_bill_remainders: Vec<(usize, usize)> = Vec::new();
     for i in 0..m {
-        let necessary_bills: usize = (b[i] + y - 1) / y;
-        b_bill_remainders.push((necessary_bills, necessary_bills * y - b[i]));
+        let necessary_bills: usize = (b[i] + k - 1) / k;
+        b_bill_remainders.push((necessary_bills, necessary_bills * k - b[i]));
     }
     b_bill_remainders.sort_by(|a, b| {
         if a.0 == b.0 {
