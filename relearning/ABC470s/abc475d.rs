@@ -2,7 +2,7 @@ use proconio::input;
 use std::collections::HashMap;
 fn main() {
     input! {s: String}
-    let s_bytes: Vec<u8> = s.s_bytes().collect();
+    let s_bytes: Vec<u8> = s.bytes().collect();
     // judge whether the string can be a prime number
     let is_prime = eratosthenes(10usize.pow(s.len() as u32));
     // char -> id
@@ -20,9 +20,9 @@ fn main() {
     // id -> number
     let n_id: usize = dictionary.len();
     let mut id_to_number: Vec<Option<usize>> = vec![None; n_id];
-    if dfs(0, n_id, &pattern, &is_prime, &mut id_to_number) {
+    if dfs(0, &pattern, &is_prime, &mut id_to_number) {
         for id in pattern.iter() {
-            print!("{}", id_to_number[id].unwrap());
+            print!("{}", id_to_number[*id].unwrap());
         }
         println!();
     } else {
@@ -53,22 +53,31 @@ fn dfs(
     id_to_number: &mut Vec<Option<usize>>,
 ) -> bool {
     if index == pattern.len() {
-        return true;
+        let mut num: usize = 0;
+        for id in pattern.iter() {
+            num = num * 10 + id_to_number[*id].unwrap();
+        }
+        if is_prime[num] {
+            return true;
+        } else {
+            return false;
+        }
     }
+    let mut res: bool = false;
     for digit in 0..10 {
         if index == 0 && digit == 0 {
             continue;
         }
         let cur_id: usize = pattern[index];
         if id_to_number[cur_id].is_none() {
-            id_to_number = Some(digit);
-            if dfs(index + 1, pattern, id_to_number) {
-                return true;
+            id_to_number[cur_id] = Some(digit);
+            if dfs(index + 1, pattern, is_prime, id_to_number) {
+                res = true;
             }
-            id_to_number = None;
+            id_to_number[cur_id] = None;
         } else {
             continue;
         }
     }
-    return false;
+    return res;
 }
