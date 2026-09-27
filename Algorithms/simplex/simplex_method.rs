@@ -77,8 +77,79 @@ impl SimplexMethod {
         // Swap basis variables
         std::mem::swap(&mut self.basis[p], &mut self.non_basis[q]);
     }
-    fn run_simplex(&mut self, obj_row: usize) -> bool {}
-    pub fn solve(&mut self) -> SimplexResult {}
+    fn run_simplex(&mut self, obj_row: usize) -> bool {
+        /* Simplex method
+        Args:
+            obj_row: objective row index
+        Returns:
+            true if optimal solution is found, false otherwise
+         */
+        loop {
+            // Find the pivot col as the maximum potential (Note the values are negative)
+            let mut q: Option<usize> = None;
+            for col in 0..self.n {
+                if q.is_none() || self.non_basis[obj_row][q.unwrap()] < self.non_basis[obj_row][col]
+                {
+                    q = Some(col);
+                }
+            }
+            let max_potential: f64 = self.non_basis[obj_row][q.unwrap()];
+            if max_potential < EPS {
+                return true;
+            }
+            let q: usize = match q {
+                Some(q) => q,
+                None => return true,
+            };
+
+            // Find the pivot row as the hardest bottleneck
+            let mut p: Option<usize> = None;
+            let mut min_ratio: f64 = INF;
+            for row in 0..self.m {
+                if self.non_basis[row][q] > EPS {
+                    // Constants divided by coefficients of pivot column
+                    let ratio: f64 = self.tableau[row][self.m + self.n] / self.non_basis[row][q];
+                    if ratio < min_ratio {
+                        min_ratio = ratio;
+                        p = Some(row);
+                    }
+                }
+            }
+            let p: usize = match p {
+                Some(p) => p,
+                None => return SimplexResult::Unbounded,
+            };
+            self.pivot(p, q);
+        }
+    }
+    pub fn solve(&mut self) -> SimplexResult {
+        /* Simplex method algorithm
+        1. Initialization: initial basic feasible solution
+        2. Pivoting: find entering and leaving variables
+        3. Termination: optimal solution found or unbounded
+        */
+        let mut min_b_row: Option<usize> = None;
+        let mut min_b: f64 = -EPS;
+        for row in 0..self.m {
+            let b: f64 = self.tableau[row][self.n];
+            if min_b.is_none() || b < min_b {
+                min_b = b;
+                min_b_row = Some(row);
+            }
+        }
+        let min_b_row = match min_b_row {
+            Some(row) => row,
+            None => return SimplexMethod::Infeasible,
+        };
+        // Two phase simplex method
+        // Phase 1: Find initial basic feasible solution
+        for j in 0..self.n {
+            self.tableau[self.m + 1][j] = 0.0;
+        }
+        self.tableau[self.m + 1][self.n] = 0.0;
+        let mut q: usize = 0;
+        // Phase 2: Optimize objective function
+    }
 }
 
 #[cfg(test)]
