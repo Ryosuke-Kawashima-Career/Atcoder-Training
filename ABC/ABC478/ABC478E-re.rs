@@ -1,4 +1,8 @@
 use proconio::{input, marker::Usize1};
+// ABC478E
+// Q. if the query type is 0: Au <= Av
+// Q. if the query type is 1: Au < Av
+// A. Topological Sort
 struct Kosaraju {
     graph: Vec<Vec<usize>>,
     graph_rev: Vec<Vec<usize>>,
@@ -26,6 +30,9 @@ impl Kosaraju {
                 self.dfs_forward(v, &mut seen, &mut order);
             }
         }
+        // here order is in reverse topological order
+        order.reverse();
+        // here order is in topological order
         order
     }
     fn get_scc(&self) -> Vec<Vec<usize>> {
@@ -67,9 +74,8 @@ fn main() {
     let mut graph: Vec<Vec<usize>> = vec![vec![]; n];
     let mut lt_edges: Vec<(usize, usize)> = Vec::new();
     for &(query_type, u, v) in queries.iter() {
+        graph[u].push(v);
         if query_type == 1 {
-            graph[u].push(v);
-        } else {
             lt_edges.push((u, v));
         }
     }
