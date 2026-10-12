@@ -10,8 +10,11 @@ fn main() {
         min_for_l[i] = min_for_l[i - 1].min(l[i - 1]);
     }
     for &(s, t) in queries.iter() {
-        let ans: usize =
-            (min_for_r[s - 1] + min_for_l[t - 1]).min(min_for_l[s - 1] + min_for_r[t - 1]);
-        println!("{ans}")
+        let ans: usize = if s < t {
+            r[s - 2].min(l[s - 2] + min_for_r[s])
+        } else {
+            l[s - 2].min(r[s - 2] + min_for_l[s - 1])
+        };
+        println!("{ans}");
     }
 }
