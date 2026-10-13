@@ -10,10 +10,19 @@ fn main() {
         min_for_l[i] = min_for_l[i - 1].min(l[i - 1]);
     }
     for &(s, t) in queries.iter() {
+        let (s, t) = (s - 1, t - 1);
         let ans: usize = if s < t {
-            r[s - 2].min(l[s - 2] + min_for_r[s])
+            if s == 0 {
+                r[s]
+            } else {
+                r[s].min(l[s - 1] + min_for_r[s])
+            }
         } else {
-            l[s - 2].min(r[s - 2] + min_for_l[s - 1])
+            if s == n - 1 {
+                l[s]
+            } else {
+                l[s].min(r[s + 1] + min_for_l[s])
+            }
         };
         println!("{ans}");
     }

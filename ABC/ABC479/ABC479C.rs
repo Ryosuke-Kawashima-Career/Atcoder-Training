@@ -8,16 +8,36 @@ fn main() {
     let n2: usize = n - n1;
     let deliciousness_left: Vec<(i64, usize)> = enum_subsets(&ab[0..n1]);
     let mut deliciousness_right: Vec<(i64, usize)> = enum_subsets(&ab[n1..n]);
-    deliciousness_right.sort_unstable_by_key(|&(volume, _)| volume);
+    deliciousness_right.sort_unstable_by_key(|&(_, weight)| weight);
+    let mut best_value_right: Vec<i64> = vec![0; deliciousness_right.len() + 1];
+    for i in 0..deliciousness_right.len() {
+        best_value_right[i + 1] = best_value_right[i].max(deliciousness_right[i].0);
+    }
     let mut ans: i64 = 0;
     for &(value_left, weight_left) in deliciousness_left.iter() {
         if w < weight_left {
             continue;
         }
-        let max_value_with_weight_limit: i64 = binary_search(w - weight_left, &deliciousness_right);
+        let max_value_with_weight_limit: i64 =
+            binary_search(w - weight_left, &deliciousness_right, &best_value_right);
         ans = ans.max(value_left + max_value_with_weight_limit)
     }
     println!("{ans}");
+}
+
+fn binary_search(w: usize, values_weights: &Vec<(i64, usize)>, best_values: &Vec<i64>) -> i64 {
+    let mut low: usize = 0;
+    let mut high: usize = values_weights.len();
+    while high - low > 1 {
+        let mid: usize = (low + high) / 2;
+        let weight_mid: usize = values_weights[mid].1;
+        if weight_mid <= w {
+            low = mid;
+        } else {
+            high = mid;
+        }
+    }
+    best_values[low]
 }
 
 fn enum_subsets(item: &[(i64, usize)]) -> Vec<(i64, usize)> {
