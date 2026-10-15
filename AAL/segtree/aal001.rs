@@ -35,6 +35,30 @@ impl SegementTree {
         }
         res
     }
+    fn query_recursive(&self, mut l: usize, mut r: usize) -> usize {
+        // (index, cell_left, cell_right, query_left, query_right)
+        return self._query_recursive(1, 0, self.size, l, r);
+    }
+    fn _query_recursive(
+        &self,
+        mut index: usize,
+        cell_left: usize,
+        cell_right: usize,
+        left: usize,
+        right: usize,
+    ) -> usize {
+        if cell_right <= left && right <= cell_left {
+            return IDENTITY;
+        }
+        if left <= cell_left && cell_right <= right {
+            return self.data[index];
+        }
+        let cell_mid: usize = (cell_left + cell_right) / 2;
+        let left_result: usize = self._query_recursive(index * 2, cell_left, cell_mid, left, right);
+        let right_result: usize =
+            self._query_recursive(index * 2 + 1, cell_mid, cell_right, left, right);
+        return left_result.min(right_result);
+    }
     fn update(&mut self, mut i: usize, x: usize) {
         i += self.size;
         self.data[i] = x;
