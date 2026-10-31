@@ -44,6 +44,7 @@ impl BitVector {
 
 /// Wavelet Matrix supporting O(log(max_val)) 2D orthogonal range counting.
 struct WaveletMatrix {
+    // WaveletMatrix is for ranking, counting, and selection of elements in a range.
     levels: Vec<BitVector>,
     zeros: Vec<usize>,
     bit_len: usize,
