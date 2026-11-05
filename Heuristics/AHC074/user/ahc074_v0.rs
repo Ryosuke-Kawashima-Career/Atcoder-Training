@@ -29,6 +29,14 @@ fn print_operations(operations: &Vec<(usize, usize)>) {
 
 fn get_sheets(n: usize, k: usize, p: usize, a: &Vec<i64>) -> Vec<Vec<char>> {
     let mut sheets: Vec<Vec<char>> = vec![vec!['.'; k]; n];
+    let mut count_blocks: Vec<usize> = vec![0; n];
+    for layer in 0..p {
+        for i in 0..n {
+            if a[layer] > 0 {
+                count_blocks[i] += 1;
+            }
+        }
+    }
     for i in 0..p-1 {
         let mut x = a[i] as usize;
         let mut y = i + 1;
