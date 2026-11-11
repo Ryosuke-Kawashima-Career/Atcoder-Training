@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore Andrew's monotone chain convex hull algorithm, one push, pop, and cross product at a time.">
+  <title>Convex Hull — Algorithm Lab</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="model.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand"><span class="brand-mark" aria-hidden="true">⌁</span> ALGORITHM LAB <span class="divider">/</span> COMPUTATIONAL GEOMETRY</div>
+      <span class="file-tag">convex_hull.rs</span>
+    </header>
+    <section class="intro">
+      <div><div class="eyebrow">01 / ANDREW’S MONOTONE CHAIN</div><h1>Find the outer edge.</h1>
+        <p>A convex hull is a rubber band stretched around a set of points.<br class="desktop-break"> Watch the algorithm build it, one turn at a time.</p></div>
+      <div class="complexity"><span>TIME</span><strong>O(n log n)</strong><span>SPACE <b>O(n)</b></span></div>
+    </section>
+    <div class="workspace">
+      <section class="scene" aria-label="Interactive point plane">
+        <div class="scene-toolbar"><label>Point set <select id="preset"><option value="lesson">The walkthrough</option><option value="pops">Repeated pops</option><option value="collinear">On a line</option><option value="triangle">Triangle + interior</option><option value="random">Random points</option></select></label>
+          <button id="shuffle" class="subtle">New random set</button><label class="check"><input id="preview" type="checkbox"> Final hull guide</label></div>
+        <div class="plot-container"><svg id="plot" viewBox="0 0 800 570" role="img" aria-labelledby="plot-title plot-desc"><title id="plot-title">Convex hull construction</title><desc id="plot-desc">A coordinate plane showing the points, current chain, and candidate turn. Click empty grid space to add a point, or an existing point to remove it.</desc></svg>
+          <div class="plot-caption"><span><i class="dot lower-dot"></i>Lower chain</span><span><i class="dot upper-dot"></i>Upper chain</span><span><i class="candidate-dot"></i>Candidate</span></div>
+        </div>
+        <div class="edit-hint"><span>＋ Click the grid to add · click a point to remove</span><span id="point-count"></span></div>
+        <div class="transport">
+          <div class="transport-top"><div class="playback"><button id="restart" title="Restart" aria-label="Restart">↺</button><button id="back" aria-label="Previous step">←</button><button id="play" class="primary">Play <span aria-hidden="true">▶</span></button><button id="next" aria-label="Next step">→</button><button id="finish">Finish ↗</button></div>
+            <label class="speed-label">Speed <select id="speed"><option value="1400">Slow</option><option value="800" selected>Normal</option><option value="300">Fast</option></select></label></div>
+          <label class="timeline-label" for="timeline"><span id="phase-text">Sort</span><span id="step-text">Step 1</span></label>
+          <input id="timeline" type="range" min="0" max="1" value="0" aria-label="Algorithm step">
+        </div>
+      </section>
+      <aside class="inspector">
+        <section class="explanation"><div class="section-label">WHAT’S HAPPENING <span id="action-badge">SORT</span></div><h2 id="event-title">First, put the points in order.</h2><p id="event-text" aria-live="polite"></p></section>
+        <section class="turn-panel"><div class="section-label">THE TURN TEST <span>外積</span></div>
+          <div id="turn-formula" class="formula">(Bₓ − Aₓ)(Cᵧ − Aᵧ) − (Bᵧ − Aᵧ)(Cₓ − Aₓ)</div>
+          <div class="turn-result"><span id="turn-value">—</span><div id="turn-label">Waiting for three points</div></div>
+          <div class="turn-key"><span>&gt; 0 <b>Left · keep</b></span><span>≤ 0 <b>Right / straight · pop</b></span></div>
+        </section>
+        <section class="stacks"><div class="section-label">THE STACKS <span>末尾 →</span></div><div class="stack-row"><span class="stack-label lower-color">Lower</span><div id="lower-stack" class="stack-items"></div></div><div class="stack-row"><span class="stack-label upper-color">Upper</span><div id="upper-stack" class="stack-items"></div></div></section>
+        <section class="code-panel"><div class="section-label">CORRECTED RUST WALKTHROUGH <span>↙ LIVE</span></div><pre id="code" aria-label="Corrected Rust algorithm with current line highlighted"></pre></section>
+      </aside>
+    </div>
+    <section class="bottom-grid">
+      <div><div class="eyebrow">THE INVARIANT</div><h3>Keep turning left.</h3><p>Each stack keeps a convex chain. A right turn bends inward; a straight turn leaves an unnecessary middle point. Pop that middle point and test again before pushing the candidate.</p></div>
+      <div><div class="eyebrow">WHY IT’S FAST</div><h3>Every point enters and leaves once.</h3><p>Sorting costs O(n log n). After that, both scans are O(n): although a step can pop several points, each point is pushed once and popped at most once per chain.</p></div>
+      <details><summary>How this relates to your Rust file <span>＋</span></summary><p>The visualization follows the intended, corrected algorithm. Your source currently sorts <code>Point</code> using tuple fields (<code>.0, .1</code>) instead of <code>.x, .y</code>; it tests and pushes the input vector instead of <code>lower</code>/<code>upper</code>; and uses <code>if</code> instead of <code>while</code>. Mutating that input vector while iterating also fails Rust’s borrowing rules. The original file is preserved.</p><p>Try “Repeated pops” to see why one <code>if</code> cannot restore the chain. “On a line” shows why the condition is <code>≤ 0</code> when only extreme vertices should remain.</p></details>
+    </section>
+    <footer><span>SORT → LOWER → UPPER → JOIN</span><span>Exact integer coordinates · no dependencies · runs offline</span></footer>
+  </main>
+</body>
+</html>
