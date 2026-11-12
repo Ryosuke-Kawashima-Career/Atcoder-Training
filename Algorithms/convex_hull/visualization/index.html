@@ -24,7 +24,7 @@
       <section class="scene" aria-label="Interactive point plane">
         <div class="scene-toolbar"><label>Point set <select id="preset"><option value="lesson">The walkthrough</option><option value="pops">Repeated pops</option><option value="collinear">On a line</option><option value="triangle">Triangle + interior</option><option value="random">Random points</option></select></label>
           <button id="shuffle" class="subtle">New random set</button><label class="check"><input id="preview" type="checkbox"> Final hull guide</label></div>
-        <div class="plot-container"><svg id="plot" viewBox="0 0 800 570" role="img" aria-labelledby="plot-title plot-desc"><title id="plot-title">Convex hull construction</title><desc id="plot-desc">A coordinate plane showing the points, current chain, and candidate turn. Click empty grid space to add a point, or an existing point to remove it.</desc></svg>
+        <div class="plot-container"><svg id="plot" viewBox="0 0 800 570" role="group" aria-labelledby="plot-title plot-desc"><title id="plot-title">Convex hull construction</title><desc id="plot-desc">A coordinate plane showing the points, current chain, and candidate turn. Click empty grid space to add a point, or an existing point to remove it.</desc></svg>
           <div class="plot-caption"><span><i class="dot lower-dot"></i>Lower chain</span><span><i class="dot upper-dot"></i>Upper chain</span><span><i class="candidate-dot"></i>Candidate</span></div>
         </div>
         <div class="edit-hint"><span>＋ Click the grid to add · click a point to remove</span><span id="point-count"></span></div>
