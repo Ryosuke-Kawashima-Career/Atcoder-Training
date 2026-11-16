@@ -9,16 +9,19 @@ impl Fenwick {
     }
     fn new(n: usize) -> Self {
         Self {
-            data: vec![0; n],
+            // +1 is needed to handle 1-indexed calculation
+            data: vec![0; n+1],
         }
     }
-    fn add(&mut self, mut idx: usize) {
-        while idx <= self.data.len() {
-            self.data[idx] += 1;
-            idx = Self::lsb(idx);
+    fn add(&mut self, mut idx: usize, delta: i64) {
+        idx += 1;
+        while idx < self.data.len() {
+            self.data[idx] += delta;
+            idx += Self::lsb(idx);
         }
     }
     fn sum_query(&self, mut right: usize) -> i64 {
+        // [0, right) but since UI is 0 indexed while the actual calculation is 1 indexed, this range management is okay
         let mut result: i64 = 0;
         while right > 0 {
             result += self.data[right];
@@ -46,7 +49,7 @@ fn main() {
     range_sums.dedup();
 
     // Fenwick is for counting the coordinate compression
-    let mut fenwick = Fenwick::new(n);
+    let mut fenwick = Fenwick::new(range_sums.len());
     let mut ans: i64 = 0;
     for &prefix_sum in &prefix {
         let target_left: i64 = prefix_sum - r;
@@ -55,7 +58,7 @@ fn main() {
         let index_right: usize = range_sums.partition_point(|&range_sum| range_sum <= target_right);
         ans += fenwick.range_sum_query(index_left, index_right);
         let target_index: usize = range_sums.binary_search(&prefix_sum).unwrap();
-        fenwick.add(target_index);
+        fenwick.add(target_index, 1);
     }
     println!("{}", ans);
 }

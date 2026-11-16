@@ -1,7 +1,7 @@
 use proconio::input;
 // ABC484F
 // Q. Given an array with integers including -1. Judge if we can turn all the elements of the given range the same by turning -1 into an arbitrary value.
-// A. Segment Tree
+// A. Segment Tree with expanded node implementation.
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum State {
     Empty,
