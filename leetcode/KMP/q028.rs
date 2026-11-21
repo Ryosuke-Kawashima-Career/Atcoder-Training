@@ -24,6 +24,19 @@ impl Solution {
     fn run_kmp(target: &str, pattern: &str, lps: &Vec<usize>) -> i32 {
         let n: usize = target.len();
         let m: usize = pattern.len();
-        
+        let mut i: usize = 0;
+        while i < n {
+            let mut j: usize = 0;
+            while j < m {
+                if target[i] == pattern[j] {
+                    i += 1;
+                    j += 1;
+                }
+            }
+        }
+        if i == n {
+            return -1;
+        }
+        return i;
     }
 }
