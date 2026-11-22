@@ -1,7 +1,7 @@
 use proconio::input;
 
 const NEG_INF: i64 = -(1 << 60);
-
+// A. Sorting + Shifted-Reference Knapsack DP
 fn main() {
     input! {
         n: usize,
