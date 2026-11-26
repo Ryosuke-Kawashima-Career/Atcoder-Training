@@ -38,7 +38,12 @@ impl std::ops::Mul for Complex {
         // TODO 1b: Multiply two complex numbers (a + bi)(c + di)
         // re = a*c - b*d
         // im = a*d + b*c
-        todo!()
+        let a: f64 = self.re;
+        let b: f64 = self.im;
+        let c: f64 = rhs.re;
+        let d: f64 = rhs.im;
+        // Re vs Im
+        Self::new(a * c - b * d, a * d + b * c)
     }
 }
 
