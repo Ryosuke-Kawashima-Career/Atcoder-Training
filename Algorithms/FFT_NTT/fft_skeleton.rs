@@ -13,8 +13,9 @@ impl Complex {
 
     pub fn from_polar(r: f64, theta: f64) -> Self {
         // TODO 1a: Convert polar coordinates (r, theta) to (re, im)
-        // Hint: re = r * cos(theta), im = r * sin(theta)
-        todo!()
+        let re = r * theta.cos();
+        let im = r * theta.sin();
+        Self { re, im }
     }
 }
 
@@ -36,8 +37,6 @@ impl std::ops::Mul for Complex {
     type Output = Self;
     fn mul(self, rhs: Self) -> Self::Output {
         // TODO 1b: Multiply two complex numbers (a + bi)(c + di)
-        // re = a*c - b*d
-        // im = a*d + b*c
         let a: f64 = self.re;
         let b: f64 = self.im;
         let c: f64 = rhs.re;
@@ -61,7 +60,11 @@ pub fn fft(array: &mut [Complex], invert: bool) {
     for i in 1..n {
         let mut bit = n >> 1;
         // Your bit-reversal carry loop here
-
+        while (j & bit) != 0 {
+            j ^= bit;
+            bit >>= 1;
+        }
+        j ^= bit;
         if i < j {
             array.swap(i, j);
         }
@@ -84,7 +87,19 @@ pub fn fft(array: &mut [Complex], invert: bool) {
     let mut len = 2;
     while len <= n {
         // Your butterfly code here
-
+        let angle: f64 = 2.0 * PI / (len as f64) * (if invert { -1.0 } else { 1.0 });
+        let wlen: f64 = Complex::from_polar(1.0, angle);
+        for i in (0..n).step_by(len) {
+            let mut w: f64 = Complex::new(1.0, 0.0);
+            for k in 0..(len / 2) {
+                let u: f64 = array[i + k];
+                // The opposite of u
+                let v: f64 = array[i + k + len / 2] * w;
+                array[i + k] = u + v;
+                array[i + k + len / 2] = u - v;
+                w *= wlen;
+            }
+        }
         len <<= 1;
     }
 
@@ -94,6 +109,10 @@ pub fn fft(array: &mut [Complex], invert: bool) {
     // =========================================================================
     if invert {
         // Your normalization loop here
+        for i in 0..n {
+            array[i].re /= n as f64;
+            array[i].im /= n as f64;
+        }
     }
 }
 
@@ -112,7 +131,25 @@ pub fn multiply_polynomials(a: &[i64], b: &[i64]) -> Vec<i64> {
     // 4. Run inverse FFT (`invert = true`) on `fa`.
     // 5. Round `fa[i].re.round() as i64` for `i in 0..target_len` and return.
     // =========================================================================
-    todo!()
+    let mut fa: Vec<Complex> = vec![Complex::default(); n];
+    let mut fb: Vec<Complex> = vec![Complex::default(); n];
+    for i in 0..a.len() {
+        fa[i] = Complex::new(a[i] as f64, 0.0);
+    }
+    for i in 0..b.len() {
+        fb[i] = Complex::new(b[i] as f64, 0.0);
+    }
+    fft(&mut fa, invert = false);
+    fft(&mut fb, invert = false);
+    for i in 0..n {
+        fa[i] = fa[i] * fb[i];
+    }
+    fft(&mut fa, invert = true);
+    let mut result: Vec<i64> = vec![0; target_len];
+    for i in 0..target_len {
+        result[i] = (fa[i].re.round() as i64);
+    }
+    result
 }
 
 fn main() {
