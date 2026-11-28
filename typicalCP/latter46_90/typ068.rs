@@ -1,7 +1,7 @@
 use proconio::{input, marker::Usize1};
 // pre-read all the queries before hand
 fn main() {
-    input! {n: usize, q: usize, queries: [(usize, Usize1, Usize1, i64)]}
+    input! {n: usize, q: usize, queries: [(usize, Usize1, Usize1, i64); q]}
     let mut uf = Unionfind::new(n);
     let mut sums: Vec<i64> = vec![0; n - 1];
     let mut crossing_sums: Vec<i64> = vec![0; n];
